@@ -4,6 +4,7 @@
 #include "common.h"
 
 typedef struct {
+    uint8_t* memory;
     uint16_t pc;
     uint8_t status;
     uint8_t reg_a;
@@ -21,7 +22,17 @@ void CPU_free(CPU_t*);
 
 /* Instruction processing */
 
-void CPU_interpret(CPU_t*, uint8_t*);
+// Read-Write helpers
+uint8_t CPU_mem_read_u8(CPU_t*, uint16_t);
+void CPU_mem_write_u8(CPU_t*, uint16_t, uint8_t);
+uint16_t CPU_mem_read_u16(CPU_t*, uint16_t);
+void CPU_mem_write_u16(CPU_t*, uint16_t, uint16_t);
+
+// Program execution
+void CPU_reset(CPU_t*);
+void CPU_load_and_run(CPU_t*, uint8_t*, size_t);
+void CPU_load(CPU_t*, uint8_t*, size_t);
+void CPU_run(CPU_t*);
 
 
 // Instructions

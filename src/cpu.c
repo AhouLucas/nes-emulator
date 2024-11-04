@@ -2,6 +2,7 @@
 
 CPU_t* CPU_init() {
     CPU_t* cpu = malloc(sizeof(CPU_t));
+    cpu->memory = malloc(sizeof(uint8_t)*0xFFFF);
     cpu->reg_a = 0;
     cpu->reg_x = 0;
     cpu->pc = 0;
@@ -10,21 +11,61 @@ CPU_t* CPU_init() {
 }
 
 void CPU_free(CPU_t* cpu) {
+    free(cpu->memory);
     free(cpu);
     return;
 }
 
-void CPU_interpret(CPU_t* cpu, uint8_t* program) {
-    cpu->pc = 0;
+uint8_t CPU_mem_read_u8(CPU_t* cpu, uint16_t addr) {
+    return cpu->memory[addr];
+}
 
+void CPU_mem_write_u8(CPU_t* cpu, uint16_t addr, uint8_t data) {
+    cpu->memory[addr] = data;
+}
+
+uint16_t CPU_mem_read_u16(CPU_t* cpu, uint16_t addr) {
+    uint16_t lo = CPU_mem_read_u8(cpu, addr);
+    uint16_t hi = CPU_mem_read_u8(cpu, addr+1);
+    return (hi<<8) | lo;
+}
+
+void CPU_mem_write_u16(CPU_t* cpu, uint16_t addr, uint16_t data) {
+    uint8_t hi = data>>8;
+    uint8_t lo = data & 0xFF;
+    CPU_mem_write_u8(cpu, addr, lo);
+    CPU_mem_write_u8(cpu, addr+1, hi);
+}
+
+void CPU_reset(CPU_t* cpu) {
+    cpu->reg_a = 0;
+    cpu->reg_x = 0;
+    cpu->status = 0;
+    cpu->pc = CPU_mem_read_u16(cpu, 0xFFFC);
+}
+
+void CPU_load_and_run(CPU_t* cpu, uint8_t* program, size_t program_size) {
+    CPU_load(cpu, program, program_size);
+    CPU_reset(cpu);
+    CPU_run(cpu);
+}
+
+void CPU_load(CPU_t* cpu, uint8_t* program, size_t program_size) {
+    memcpy(cpu->memory+0x8000, program, program_size);
+    CPU_mem_write_u16(cpu, 0xFFFC, 0x8000);
+}
+
+void CPU_run(CPU_t* cpu) {
     for (;;) {
-        uint8_t opcode = program[cpu->pc++];
+        uint8_t opcode = CPU_mem_read_u8(cpu, cpu->pc);
+        cpu->pc++;
 
         switch (opcode) {
 
         // LDA (0xA9)
         case 0xA9:
-            uint8_t param = program[cpu->pc++];
+            uint8_t param = CPU_mem_read_u8(cpu, cpu->pc);
+            cpu->pc++;
             CPU_LDA_0xA9(cpu, param);
             break;
 

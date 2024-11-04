@@ -38,6 +38,12 @@ void CPU_mem_write_u16(CPU_t* cpu, uint16_t addr, uint16_t data) {
 }
 
 uint16_t CPU_get_operand_addr(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t pos;
+    uint16_t base;
+    uint8_t lo, hi;
+    uint8_t ptr;
+    uint16_t deref_base;
+
     switch (mode)
     {
     case ADDR_MODE_IMMEDIATE:
@@ -47,28 +53,28 @@ uint16_t CPU_get_operand_addr(CPU_t* cpu, AddressingMode_t mode) {
     case ADDR_MODE_ABSOLUTE:
         return CPU_mem_read_u16(cpu, cpu->pc);
     case ADDR_MODE_ZERO_PAGE_X:
-        uint8_t pos = CPU_mem_read_u8(cpu, cpu->pc);
+        pos = CPU_mem_read_u8(cpu, cpu->pc);
         return pos + cpu->reg_x;
     case ADDR_MODE_ZERO_PAGE_Y:
-        uint8_t pos = CPU_mem_read_u8(cpu, cpu->pc);
+        pos = CPU_mem_read_u8(cpu, cpu->pc);
         return pos + cpu->reg_y;
     case ADDR_MODE_ABSOLUTE_X:
-        uint16_t base = CPU_mem_read_u16(cpu, cpu->pc);
+        base = CPU_mem_read_u16(cpu, cpu->pc);
         return base + ((uint16_t)cpu->reg_x);
     case ADDR_MODE_ABSOLUTE_Y:
-        uint16_t base = CPU_mem_read_u16(cpu, cpu->pc);
+        base = CPU_mem_read_u16(cpu, cpu->pc);
         return base + ((uint16_t)cpu->reg_y);
     case ADDR_MODE_INDIRECT_X:
-        uint8_t base = CPU_mem_read_u8(cpu, cpu->pc);
-        uint8_t ptr = (uint8_t)base + cpu->reg_x;
-        uint8_t lo = CPU_mem_read_u8(cpu, ptr);
-        uint8_t hi = CPU_mem_read_u8(cpu, ptr+1);
+        base = CPU_mem_read_u8(cpu, cpu->pc);
+        ptr = (uint8_t)base + cpu->reg_x;
+        lo = CPU_mem_read_u8(cpu, ptr);
+        hi = CPU_mem_read_u8(cpu, ptr+1);
         return ((uint16_t) hi)<<8 | ((uint16_t) lo);
     case ADDR_MODE_INDIRECT_Y:
-        uint8_t base = CPU_mem_read_u8(cpu, cpu->pc);
-        uint8_t lo = CPU_mem_read_u8(cpu, base);
-        uint8_t hi = CPU_mem_read_u16(cpu, base+1);
-        uint16_t deref_base = ((uint16_t) hi)<<8 | ((uint16_t) lo);
+        base = CPU_mem_read_u8(cpu, cpu->pc);
+        lo = CPU_mem_read_u8(cpu, base);
+        hi = CPU_mem_read_u8(cpu, base+1);
+        deref_base = ((uint16_t) hi)<<8 | ((uint16_t) lo);
         return deref_base + ((uint16_t) cpu->reg_y);
     default:
         break;
@@ -100,17 +106,78 @@ void CPU_run(CPU_t* cpu) {
 
         switch (opcode) {
 
-        // LDA (0xA9)
+        /* BEGIN LDA */
+
+        // Immediate mode (0xA9)
         case 0xA9:
-            uint8_t param = CPU_mem_read_u8(cpu, cpu->pc);
+            CPU_LDA(cpu, ADDR_MODE_IMMEDIATE);
             cpu->pc++;
-            CPU_LDA(cpu, param);
+            break;
+        
+        // Zero Page mode (0xA5)
+        case 0xA5:
+            CPU_LDA(cpu, ADDR_MODE_ZERO_PAGE);
+            cpu->pc++;
             break;
 
-        // TAX (0xAA)
+        // Zero Page X mode (0xB5)
+        case 0xB5:
+            CPU_LDA(cpu, ADDR_MODE_ZERO_PAGE_X);
+            cpu->pc++;
+            break;
+        
+        // Absolute mode (0xAD)
+        case 0xAD:
+            CPU_LDA(cpu, ADDR_MODE_ABSOLUTE);
+            cpu->pc += 2;
+            break;
+
+        // Absolute X mode (0xBD)
+        case 0xBD:
+            CPU_LDA(cpu, ADDR_MODE_ABSOLUTE_X);
+            cpu->pc += 2;
+            break;
+        
+        // Absolute Y mode (0xB9)
+        case 0xB9:
+            CPU_LDA(cpu, ADDR_MODE_ABSOLUTE_Y);
+            cpu->pc += 2;
+            break;
+
+        // Indirect X mode (0xA1)
+        case 0xA1:
+            CPU_LDA(cpu, ADDR_MODE_INDIRECT_X);
+            cpu->pc++;
+            break;
+
+        // Indirect Y mode (0xB1)
+        case 0xB1:
+            CPU_LDA(cpu, ADDR_MODE_INDIRECT_Y);
+            cpu->pc++;
+            break;
+        
+        /* END LDA */
+
+        /* BEGIN STA */
+        
+        // Zero Page mode  (0x85)
+        case 0x85:
+            CPU_STA(cpu, ADDR_MODE_ZERO_PAGE);
+            cpu->pc++;
+            break;
+        
+        // TODO: Implement other addressing mode for STA instruction
+
+        /* END STA */
+
+
+        /* BEGIN TAX */
+
         case 0xAA:
             CPU_TAX(cpu);
             break;
+
+        /* END TAX */
 
         // INX (0xE8)
         case 0xE8:
@@ -128,9 +195,17 @@ void CPU_run(CPU_t* cpu) {
 }
 
 
-void CPU_LDA(CPU_t* cpu, uint8_t value) {
+void CPU_LDA(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+
     cpu->reg_a = value;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
+}
+
+void CPU_STA(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    CPU_mem_write_u8(cpu, addr, cpu->reg_a);
 }
 
 void CPU_TAX(CPU_t* cpu) {

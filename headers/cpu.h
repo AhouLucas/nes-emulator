@@ -55,6 +55,7 @@ void CPU_run(CPU_t*);
 
 // Instructions
 void CPU_LDA(CPU_t*, AddressingMode_t);
+void CPU_STA(CPU_t*, AddressingMode_t);
 void CPU_TAX(CPU_t*);
 void CPU_INX(CPU_t*);
 

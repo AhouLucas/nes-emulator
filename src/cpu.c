@@ -37,6 +37,44 @@ void CPU_mem_write_u16(CPU_t* cpu, uint16_t addr, uint16_t data) {
     CPU_mem_write_u8(cpu, addr+1, hi);
 }
 
+uint16_t CPU_get_operand_addr(CPU_t* cpu, AddressingMode_t mode) {
+    switch (mode)
+    {
+    case ADDR_MODE_IMMEDIATE:
+        return cpu->pc;
+    case ADDR_MODE_ZERO_PAGE:
+        return CPU_mem_read_u16(cpu, cpu->pc);
+    case ADDR_MODE_ABSOLUTE:
+        return CPU_mem_read_u16(cpu, cpu->pc);
+    case ADDR_MODE_ZERO_PAGE_X:
+        uint8_t pos = CPU_mem_read_u8(cpu, cpu->pc);
+        return pos + cpu->reg_x;
+    case ADDR_MODE_ZERO_PAGE_Y:
+        uint8_t pos = CPU_mem_read_u8(cpu, cpu->pc);
+        return pos + cpu->reg_y;
+    case ADDR_MODE_ABSOLUTE_X:
+        uint16_t base = CPU_mem_read_u16(cpu, cpu->pc);
+        return base + ((uint16_t)cpu->reg_x);
+    case ADDR_MODE_ABSOLUTE_Y:
+        uint16_t base = CPU_mem_read_u16(cpu, cpu->pc);
+        return base + ((uint16_t)cpu->reg_y);
+    case ADDR_MODE_INDIRECT_X:
+        uint8_t base = CPU_mem_read_u8(cpu, cpu->pc);
+        uint8_t ptr = (uint8_t)base + cpu->reg_x;
+        uint8_t lo = CPU_mem_read_u8(cpu, ptr);
+        uint8_t hi = CPU_mem_read_u8(cpu, ptr+1);
+        return ((uint16_t) hi)<<8 | ((uint16_t) lo);
+    case ADDR_MODE_INDIRECT_Y:
+        uint8_t base = CPU_mem_read_u8(cpu, cpu->pc);
+        uint8_t lo = CPU_mem_read_u8(cpu, base);
+        uint8_t hi = CPU_mem_read_u16(cpu, base+1);
+        uint16_t deref_base = ((uint16_t) hi)<<8 | ((uint16_t) lo);
+        return deref_base + ((uint16_t) cpu->reg_y);
+    default:
+        break;
+    }
+}
+
 void CPU_reset(CPU_t* cpu) {
     cpu->reg_a = 0;
     cpu->reg_x = 0;
@@ -66,17 +104,17 @@ void CPU_run(CPU_t* cpu) {
         case 0xA9:
             uint8_t param = CPU_mem_read_u8(cpu, cpu->pc);
             cpu->pc++;
-            CPU_LDA_0xA9(cpu, param);
+            CPU_LDA(cpu, param);
             break;
 
         // TAX (0xAA)
         case 0xAA:
-            CPU_TAX_0xAA(cpu);
+            CPU_TAX(cpu);
             break;
 
         // INX (0xE8)
         case 0xE8:
-            CPU_INX_0xE8(cpu);
+            CPU_INX(cpu);
             break;
         
         // BRK (0x00)
@@ -90,17 +128,17 @@ void CPU_run(CPU_t* cpu) {
 }
 
 
-void CPU_LDA_0xA9(CPU_t* cpu, uint8_t value) {
+void CPU_LDA(CPU_t* cpu, uint8_t value) {
     cpu->reg_a = value;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
 }
 
-void CPU_TAX_0xAA(CPU_t* cpu) {
+void CPU_TAX(CPU_t* cpu) {
     cpu->reg_x = cpu->reg_a;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
 }
 
-void CPU_INX_0xE8(CPU_t* cpu) {
+void CPU_INX(CPU_t* cpu) {
     cpu->reg_x++;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
 }

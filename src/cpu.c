@@ -166,10 +166,21 @@ void CPU_run(CPU_t* cpu) {
             cpu->pc++;
             break;
         
-        // TODO: Implement other addressing mode for STA instruction
+        // Zero Page X mode (0x95)
+        case 0x95:
+            CPU_STA(cpu, ADDR_MODE_ZERO_PAGE_X);
+            cpu->pc++;
+            break;
+        
+        // Absolute (0x8D)
+        case 0x8D:
+            CPU_STA(cpu, ADDR_MODE_ABSOLUTE);
+            cpu->pc += 2;
+            break;
+
+        // TODO
 
         /* END STA */
-
 
         /* BEGIN TAX */
 

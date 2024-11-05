@@ -178,7 +178,29 @@ void CPU_run(CPU_t* cpu) {
             cpu->pc += 2;
             break;
 
-        // TODO
+        // Absolute X (0x9D)
+        case 0x9D:
+            CPU_STA(cpu, ADDR_MODE_ABSOLUTE_X);
+            cpu->pc += 2;
+            break;
+        
+        // Absolute Y (0x99)
+        case 0x99:
+            CPU_STA(cpu, ADDR_MODE_ABSOLUTE_Y);
+            cpu->pc += 2;
+            break;
+
+        // Indirect X (0x81)
+        case 0x81:
+            CPU_STA(cpu, ADDR_MODE_INDIRECT_X);
+            cpu->pc++;
+            break;
+
+        // Indirect Y (0x91)
+        case 0x91:
+            CPU_STA(cpu, ADDR_MODE_INDIRECT_Y);
+            cpu->pc++;
+            break;
 
         /* END STA */
 

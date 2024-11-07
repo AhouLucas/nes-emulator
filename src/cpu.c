@@ -17,6 +17,7 @@ void CPU_free(CPU_t* cpu) {
 }
 
 uint8_t CPU_mem_read_u8(CPU_t* cpu, uint16_t addr) {
+    cpu->pc++;
     return cpu->memory[addr];
 }
 
@@ -25,6 +26,7 @@ void CPU_mem_write_u8(CPU_t* cpu, uint16_t addr, uint8_t data) {
 }
 
 uint16_t CPU_mem_read_u16(CPU_t* cpu, uint16_t addr) {
+    cpu->pc += 2;
     uint16_t lo = CPU_mem_read_u8(cpu, addr);
     uint16_t hi = CPU_mem_read_u8(cpu, addr+1);
     return (hi<<8) | lo;
@@ -102,7 +104,6 @@ void CPU_load(CPU_t* cpu, uint8_t* program, size_t program_size) {
 void CPU_run(CPU_t* cpu) {
     for (;;) {
         uint8_t opcode = CPU_mem_read_u8(cpu, cpu->pc);
-        cpu->pc++;
 
         switch (opcode) {
 
@@ -111,49 +112,41 @@ void CPU_run(CPU_t* cpu) {
         // Immediate mode (0xA9)
         case 0xA9:
             CPU_LDA(cpu, ADDR_MODE_IMMEDIATE);
-            cpu->pc++;
             break;
         
         // Zero Page mode (0xA5)
         case 0xA5:
             CPU_LDA(cpu, ADDR_MODE_ZERO_PAGE);
-            cpu->pc++;
             break;
 
         // Zero Page X mode (0xB5)
         case 0xB5:
             CPU_LDA(cpu, ADDR_MODE_ZERO_PAGE_X);
-            cpu->pc++;
             break;
         
         // Absolute mode (0xAD)
         case 0xAD:
             CPU_LDA(cpu, ADDR_MODE_ABSOLUTE);
-            cpu->pc += 2;
             break;
 
         // Absolute X mode (0xBD)
         case 0xBD:
             CPU_LDA(cpu, ADDR_MODE_ABSOLUTE_X);
-            cpu->pc += 2;
             break;
         
         // Absolute Y mode (0xB9)
         case 0xB9:
             CPU_LDA(cpu, ADDR_MODE_ABSOLUTE_Y);
-            cpu->pc += 2;
             break;
 
         // Indirect X mode (0xA1)
         case 0xA1:
             CPU_LDA(cpu, ADDR_MODE_INDIRECT_X);
-            cpu->pc++;
             break;
 
         // Indirect Y mode (0xB1)
         case 0xB1:
             CPU_LDA(cpu, ADDR_MODE_INDIRECT_Y);
-            cpu->pc++;
             break;
         
         /* END LDA */
@@ -163,49 +156,43 @@ void CPU_run(CPU_t* cpu) {
         // Zero Page mode  (0x85)
         case 0x85:
             CPU_STA(cpu, ADDR_MODE_ZERO_PAGE);
-            cpu->pc++;
             break;
         
         // Zero Page X mode (0x95)
         case 0x95:
             CPU_STA(cpu, ADDR_MODE_ZERO_PAGE_X);
-            cpu->pc++;
             break;
         
         // Absolute (0x8D)
         case 0x8D:
             CPU_STA(cpu, ADDR_MODE_ABSOLUTE);
-            cpu->pc += 2;
             break;
 
         // Absolute X (0x9D)
         case 0x9D:
             CPU_STA(cpu, ADDR_MODE_ABSOLUTE_X);
-            cpu->pc += 2;
             break;
         
         // Absolute Y (0x99)
         case 0x99:
             CPU_STA(cpu, ADDR_MODE_ABSOLUTE_Y);
-            cpu->pc += 2;
             break;
 
         // Indirect X (0x81)
         case 0x81:
             CPU_STA(cpu, ADDR_MODE_INDIRECT_X);
-            cpu->pc++;
             break;
 
         // Indirect Y (0x91)
         case 0x91:
             CPU_STA(cpu, ADDR_MODE_INDIRECT_Y);
-            cpu->pc++;
             break;
 
         /* END STA */
 
         /* BEGIN TAX */
 
+        // TAX (0xAA) Only in implied mode
         case 0xAA:
             CPU_TAX(cpu);
             break;

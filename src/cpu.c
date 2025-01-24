@@ -1,5 +1,70 @@
 #include "../headers/cpu.h"
 
+
+OpcodeEntry opcode_table[256] = {
+    [0x29] = {CPU_AND, ADDR_MODE_IMMEDIATE},
+    [0x25] = {CPU_AND, ADDR_MODE_ZERO_PAGE},
+    [0x35] = {CPU_AND, ADDR_MODE_ZERO_PAGE_X},
+    [0x2D] = {CPU_AND, ADDR_MODE_ABSOLUTE},
+    [0x3D] = {CPU_AND, ADDR_MODE_ABSOLUTE_X},
+    [0x39] = {CPU_AND, ADDR_MODE_ABSOLUTE_Y},
+    [0x21] = {CPU_AND, ADDR_MODE_INDIRECT_X},
+    [0x31] = {CPU_AND, ADDR_MODE_INDIRECT_Y},
+
+    [0x49] = {CPU_EOR, ADDR_MODE_IMMEDIATE},
+    [0x45] = {CPU_EOR, ADDR_MODE_ZERO_PAGE},
+    [0x55] = {CPU_EOR, ADDR_MODE_ZERO_PAGE_X},
+    [0x4D] = {CPU_EOR, ADDR_MODE_ABSOLUTE},
+    [0x5D] = {CPU_EOR, ADDR_MODE_ABSOLUTE_X},
+    [0x59] = {CPU_EOR, ADDR_MODE_ABSOLUTE_Y},
+    [0x41] = {CPU_EOR, ADDR_MODE_INDIRECT_X},
+    [0x51] = {CPU_EOR, ADDR_MODE_INDIRECT_Y},
+
+    [0xE8] = {CPU_INX, ADDR_MODE_IMPLICIT},
+
+    [0xC8] = {CPU_INY, ADDR_MODE_IMPLICIT},
+
+    [0xA9] = {CPU_LDA, ADDR_MODE_IMMEDIATE},
+    [0xA5] = {CPU_LDA, ADDR_MODE_ZERO_PAGE},
+    [0xB5] = {CPU_LDA, ADDR_MODE_ZERO_PAGE_X},
+    [0xAD] = {CPU_LDA, ADDR_MODE_ABSOLUTE},
+    [0xBD] = {CPU_LDA, ADDR_MODE_ABSOLUTE_X},
+    [0xB9] = {CPU_LDA, ADDR_MODE_ABSOLUTE_Y},
+    [0xA1] = {CPU_LDA, ADDR_MODE_INDIRECT_X},
+    [0xB1] = {CPU_LDA, ADDR_MODE_INDIRECT_Y},
+    
+    [0xA2] = {CPU_LDX, ADDR_MODE_IMMEDIATE},
+    [0xA6] = {CPU_LDX, ADDR_MODE_ZERO_PAGE},
+    [0xB6] = {CPU_LDX, ADDR_MODE_ZERO_PAGE_Y},
+    [0xAE] = {CPU_LDX, ADDR_MODE_ABSOLUTE},
+    [0xBE] = {CPU_LDX, ADDR_MODE_ABSOLUTE_Y},
+
+    [0xA0] = {CPU_LDY, ADDR_MODE_IMMEDIATE},
+    [0xA4] = {CPU_LDY, ADDR_MODE_ZERO_PAGE},
+    [0xB4] = {CPU_LDY, ADDR_MODE_ZERO_PAGE_X},
+    [0xAC] = {CPU_LDY, ADDR_MODE_ABSOLUTE},
+    [0xBC] = {CPU_LDY, ADDR_MODE_ABSOLUTE_X},
+
+    [0x09] = {CPU_ORA, ADDR_MODE_IMMEDIATE},
+    [0x05] = {CPU_ORA, ADDR_MODE_ZERO_PAGE},
+    [0x15] = {CPU_ORA, ADDR_MODE_ZERO_PAGE_X},
+    [0x0D] = {CPU_ORA, ADDR_MODE_ABSOLUTE},
+    [0x1D] = {CPU_ORA, ADDR_MODE_ABSOLUTE_X},
+    [0x19] = {CPU_ORA, ADDR_MODE_ABSOLUTE_Y},
+    [0x01] = {CPU_ORA, ADDR_MODE_INDIRECT_X},
+    [0x11] = {CPU_ORA, ADDR_MODE_INDIRECT_Y},
+
+    [0x85] = {CPU_STA, ADDR_MODE_ZERO_PAGE},
+    [0x95] = {CPU_STA, ADDR_MODE_ZERO_PAGE_X},
+    [0x8D] = {CPU_STA, ADDR_MODE_ABSOLUTE},
+    [0x9D] = {CPU_STA, ADDR_MODE_ABSOLUTE_X},
+    [0x99] = {CPU_STA, ADDR_MODE_ABSOLUTE_Y},
+    [0x81] = {CPU_STA, ADDR_MODE_INDIRECT_X},
+    [0x91] = {CPU_STA, ADDR_MODE_INDIRECT_Y},
+
+    [0xAA] = {CPU_TAX, ADDR_MODE_IMPLICIT},
+};
+
 CPU_t* CPU_init() {
     CPU_t* cpu = malloc(sizeof(CPU_t));
     cpu->memory = malloc(sizeof(uint8_t)*0xFFFF);
@@ -7,6 +72,7 @@ CPU_t* CPU_init() {
     cpu->reg_x = 0;
     cpu->pc = 0;
     cpu->status = 0;
+    cpu->stack_pointer = STACK_RESET;
     return cpu;
 }
 
@@ -79,6 +145,8 @@ uint16_t CPU_get_operand_addr(CPU_t* cpu, AddressingMode_t mode) {
         deref_base = ((uint16_t) hi)<<8 | ((uint16_t) lo);
         return deref_base + ((uint16_t) cpu->reg_y);
     default:
+        printf("Unknown Addressing mode\n");
+        exit(EXIT_FAILURE);
         break;
     }
 }
@@ -105,115 +173,30 @@ void CPU_run(CPU_t* cpu) {
     for (;;) {
         uint8_t opcode = CPU_mem_read_u8(cpu, cpu->pc);
 
-        switch (opcode) {
+        if (opcode == 0x00) return;
 
-        /* BEGIN LDA */
-
-        // Immediate mode (0xA9)
-        case 0xA9:
-            CPU_LDA(cpu, ADDR_MODE_IMMEDIATE);
-            break;
-        
-        // Zero Page mode (0xA5)
-        case 0xA5:
-            CPU_LDA(cpu, ADDR_MODE_ZERO_PAGE);
-            break;
-
-        // Zero Page X mode (0xB5)
-        case 0xB5:
-            CPU_LDA(cpu, ADDR_MODE_ZERO_PAGE_X);
-            break;
-        
-        // Absolute mode (0xAD)
-        case 0xAD:
-            CPU_LDA(cpu, ADDR_MODE_ABSOLUTE);
-            break;
-
-        // Absolute X mode (0xBD)
-        case 0xBD:
-            CPU_LDA(cpu, ADDR_MODE_ABSOLUTE_X);
-            break;
-        
-        // Absolute Y mode (0xB9)
-        case 0xB9:
-            CPU_LDA(cpu, ADDR_MODE_ABSOLUTE_Y);
-            break;
-
-        // Indirect X mode (0xA1)
-        case 0xA1:
-            CPU_LDA(cpu, ADDR_MODE_INDIRECT_X);
-            break;
-
-        // Indirect Y mode (0xB1)
-        case 0xB1:
-            CPU_LDA(cpu, ADDR_MODE_INDIRECT_Y);
-            break;
-        
-        /* END LDA */
-
-        /* BEGIN STA */
-        
-        // Zero Page mode  (0x85)
-        case 0x85:
-            CPU_STA(cpu, ADDR_MODE_ZERO_PAGE);
-            break;
-        
-        // Zero Page X mode (0x95)
-        case 0x95:
-            CPU_STA(cpu, ADDR_MODE_ZERO_PAGE_X);
-            break;
-        
-        // Absolute (0x8D)
-        case 0x8D:
-            CPU_STA(cpu, ADDR_MODE_ABSOLUTE);
-            break;
-
-        // Absolute X (0x9D)
-        case 0x9D:
-            CPU_STA(cpu, ADDR_MODE_ABSOLUTE_X);
-            break;
-        
-        // Absolute Y (0x99)
-        case 0x99:
-            CPU_STA(cpu, ADDR_MODE_ABSOLUTE_Y);
-            break;
-
-        // Indirect X (0x81)
-        case 0x81:
-            CPU_STA(cpu, ADDR_MODE_INDIRECT_X);
-            break;
-
-        // Indirect Y (0x91)
-        case 0x91:
-            CPU_STA(cpu, ADDR_MODE_INDIRECT_Y);
-            break;
-
-        /* END STA */
-
-        /* BEGIN TAX */
-
-        // TAX (0xAA) Only in implied mode
-        case 0xAA:
-            CPU_TAX(cpu);
-            break;
-
-        /* END TAX */
-
-        // INX (0xE8)
-        case 0xE8:
-            CPU_INX(cpu);
-            break;
-        
-        // BRK (0x00)
-        case 0x00:
-            return;
-
-        default:
-            break;
+        OpcodeEntry entry = opcode_table[opcode];
+        if (entry.instruction != NULL) {
+            entry.instruction(cpu, entry.mode);
+        }
+        else {
+            printf("Unknown or unimplemented instruction (skipped)\n");   
         }
     }
 }
 
+
+void CPU_AND(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    CPU_set_register_a(cpu, cpu->reg_a & value);
+}
+
+void CPU_EOR(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    CPU_set_register_a(cpu, cpu->reg_a ^ value);
+}
 
 void CPU_LDA(CPU_t* cpu, AddressingMode_t mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
@@ -221,6 +204,26 @@ void CPU_LDA(CPU_t* cpu, AddressingMode_t mode) {
 
     cpu->reg_a = value;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
+}
+
+void CPU_LDX(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    cpu->reg_x = value;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
+}
+
+void CPU_LDY(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    cpu->reg_y = value;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_y);
+}
+
+void CPU_ORA(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    CPU_set_register_a(cpu, cpu->reg_a | value);
 }
 
 void CPU_STA(CPU_t* cpu, AddressingMode_t mode) {
@@ -238,18 +241,61 @@ void CPU_INX(CPU_t* cpu) {
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
 }
 
+void CPU_INY(CPU_t* cpu) {
+    cpu->reg_y++;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_y);
+}
+
+
+void CPU_set_status_flag(CPU_t* cpu, StatusFlag_t flag) {
+    cpu->status |= flag;
+}
+
+void CPU_clear_status_flag(CPU_t* cpu, StatusFlag_t flag) {
+    cpu->status &= ~flag;
+}
+
 void CPU_update_zero_and_negative_flags(CPU_t* cpu, uint8_t result) {
     if (result == 0) {
-        cpu->status |= 0b00000010;
+        CPU_set_status_flag(cpu, ZERO_FLAG);
     }
     else {
-        cpu->status &= 0b11111101;
+        CPU_clear_status_flag(cpu, ZERO_FLAG);
     }
 
     if ((result & 0b10000000) != 0) {
-        cpu->status |= 0b10000000;
+        CPU_set_status_flag(cpu, NEGATIVE_FLAG);
     }
     else {
-        cpu->status &= 0b01111111;
+        CPU_clear_status_flag(cpu, NEGATIVE_FLAG);
     }
+}
+
+void CPU_set_register_a(CPU_t* cpu, uint8_t value) {
+    cpu->reg_a = value;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
+}
+
+void CPU_add_to_register_a(CPU_t* cpu, uint8_t value) {
+    uint16_t sum = ((uint16_t) cpu->reg_a) + ((uint16_t) value) + ((uint16_t) (cpu->status & 0b00000001));
+
+    uint16_t carry = sum > 0xFF;
+    
+    if (carry) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    uint8_t result = (uint8_t) sum;
+
+    if (((value ^ result) & (result ^ cpu->reg_a) & 0x80) != 0) {
+        CPU_set_status_flag(cpu, OVERFLOW_FLAG);
+    } 
+    else {
+        CPU_clear_status_flag(cpu, OVERFLOW_FLAG);
+    }
+
+    CPU_set_register_a(cpu, result);
 }

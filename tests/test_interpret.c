@@ -57,12 +57,16 @@ void test_simple_5_instructions_program() {
 }
 
 int main(int argc, char const *argv[]){
+
+    printf("Begin test ...\n");
     
     test_0xA9_LDA_immediate_load_data();
     test_0xA9_LDA_zero_flag();
     test_0xA5_LDA_from_memory();
     test_0xAA_TAX_move_a_to_x();
     test_simple_5_instructions_program();
+
+    printf("All test passed\n");
 
     return 0;
 }

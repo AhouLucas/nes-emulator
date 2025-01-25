@@ -17,7 +17,7 @@
 ///  +----------------- Negative Flag
 ///
 
-typedef struct {
+typedef struct CPU {
     uint8_t* memory;
     uint16_t pc;
     uint8_t status;
@@ -27,23 +27,21 @@ typedef struct {
     uint8_t reg_y;
 } CPU_t;
 
-const uint16_t STACK = 0x0100;
-const uint8_t STACK_RESET = 0xFD;
-
 
 typedef enum {
     CARRY_FLAG          = 0b00000001,
     ZERO_FLAG           = 0b00000010,
     INTERRUPT_DISABLE   = 0b00000100,
     DECIMAL_MODE        = 0b00001000,
-    BREAK_COMMAND       = 0b00010000,
-    BREAK_FLAG          = 0b00010000,
+    BREAK               = 0b00010000,
+    BREAK2              = 0b00100000,
     OVERFLOW_FLAG       = 0b01000000,
     NEGATIVE_FLAG       = 0b10000000,
 } StatusFlag_t;
 
 
 typedef enum {
+    ADDR_MODE_ACCUMULATOR,
     ADDR_MODE_IMMEDIATE,
     ADDR_MODE_ZERO_PAGE,
     ADDR_MODE_ZERO_PAGE_X,
@@ -59,48 +57,89 @@ typedef enum {
 
 /* Initialization */
 
-CPU_t* CPU_init(void);
-void CPU_free(CPU_t*);
+CPU_t*  CPU_init(void);
+void    CPU_free(CPU_t*);
 
 /* End initialization */
 
 
 /* Instruction processing */
 
-typedef void (*CPU_Instruction)(CPU_t*, AddressingMode_t);
+typedef enum InstructionType {
+    INSTRUCTION_TYPE_VOID,
+    INSTRUCTION_TYPE_U8,
+} InstructionType_t;
 
-typedef struct {
-    CPU_Instruction instruction;
-    AddressingMode_t mode;
-} OpcodeEntry;
+typedef union CPU_Instruction {
+    void (*void_instruction)(CPU_t*, AddressingMode_t);
+    uint8_t (*u8_instruction)(CPU_t*, AddressingMode_t);
+} CPU_Instruction;
+
+typedef struct OpcodeEntry {
+    CPU_Instruction     instruction;
+    InstructionType_t   type;
+    AddressingMode_t    mode;
+    uint8_t             len;
+    uint8_t             cycles;
+} OpcodeEntry_t;
 
 // Read-Write helpers
-uint8_t CPU_mem_read_u8(CPU_t*, uint16_t);
-void CPU_mem_write_u8(CPU_t*, uint16_t, uint8_t);
-uint16_t CPU_mem_read_u16(CPU_t*, uint16_t);
-void CPU_mem_write_u16(CPU_t*, uint16_t, uint16_t);
+
+const uint16_t  STACK       = 0x0100;
+const uint8_t   STACK_RESET = 0x00FD;
+
+uint8_t     CPU_mem_read_u8(CPU_t*, uint16_t);
+void        CPU_mem_write_u8(CPU_t*, uint16_t, uint8_t);
+uint8_t     CPU_stack_pop_u8(CPU_t*);
+void        CPU_stack_push_u8(CPU_t*, uint8_t);
+
+uint16_t    CPU_mem_read_u16(CPU_t*, uint16_t);
+void        CPU_mem_write_u16(CPU_t*, uint16_t, uint16_t);
+uint16_t    CPU_stack_pop_u16(CPU_t*);
+void        CPU_stack_push_u16(CPU_t*, uint16_t);
 
 uint16_t CPU_get_operand_addr(CPU_t*, AddressingMode_t);
 
 // Program execution
+
 void CPU_reset(CPU_t*);
 void CPU_load_and_run(CPU_t*, uint8_t*, size_t);
 void CPU_load(CPU_t*, uint8_t*, size_t);
 void CPU_run(CPU_t*);
 
 // Instructions
+
+void CPU_ADC(CPU_t*, AddressingMode_t);
 void CPU_AND(CPU_t*, AddressingMode_t);
+uint8_t CPU_ASL(CPU_t*, AddressingMode_t);
+void CPU_ASL_ACC(CPU_t*, AddressingMode_t);
+uint8_t CPU_DEC(CPU_t*, AddressingMode_t);
+void CPU_DEX(CPU_t*, AddressingMode_t);
+void CPU_DEY(CPU_t*, AddressingMode_t);
 void CPU_EOR(CPU_t*, AddressingMode_t);
+uint8_t CPU_INC(CPU_t*, AddressingMode_t);
+void CPU_INX(CPU_t*, AddressingMode_t);
+void CPU_INY(CPU_t*, AddressingMode_t);
 void CPU_LDA(CPU_t*, AddressingMode_t);
 void CPU_LDX(CPU_t*, AddressingMode_t);
 void CPU_LDY(CPU_t*, AddressingMode_t);
+uint8_t CPU_LSR(CPU_t*, AddressingMode_t);
+void CPU_LSR_ACC(CPU_t*, AddressingMode_t);
 void CPU_ORA(CPU_t*, AddressingMode_t);
+void CPU_PHP(CPU_t*, AddressingMode_t);
+void CPU_PLA(CPU_t*, AddressingMode_t);
+void CPU_PLP(CPU_t*, AddressingMode_t);
+uint8_t CPU_ROL(CPU_t*, AddressingMode_t);
+void CPU_ROL_ACC(CPU_t*, AddressingMode_t);
+uint8_t CPU_ROR(CPU_t*, AddressingMode_t);
+void CPU_ROR_ACC(CPU_t*, AddressingMode_t);
+void CPU_SBC(CPU_t*, AddressingMode_t);
 void CPU_STA(CPU_t*, AddressingMode_t);
-void CPU_TAX(CPU_t*);
-void CPU_INX(CPU_t*);
-void CPU_INY(CPU_t*);
+void CPU_TAX(CPU_t*, AddressingMode_t);
 
-// CPU state update
+// CPU state functions
+
+uint8_t CPU_get_status_flag(CPU_t*, StatusFlag_t);
 void CPU_set_status_flag(CPU_t*, StatusFlag_t);
 void CPU_clear_status_flag(CPU_t*, StatusFlag_t);
 void CPU_update_zero_and_negative_flags(CPU_t*, uint8_t);

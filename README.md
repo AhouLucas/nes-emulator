@@ -1,18 +1,18 @@
 # nes-emulator
+
 NES Emulator written in C
 
-
 ## References
+
 - https://www.nesdev.org/obelisk-6502-guide/index.html
 - https://bugzmanov.github.io/nes_ebook/
 - http://www.6502.org/tutorials/6502opcodes.html
 
-
 ## TODO
 
-- [ ] ADC
+- [x] ADC
 - [x] AND
-- [ ] ASL
+- [x] ASL
 - [ ] BCC
 - [ ] BCS
 - [ ] BEQ
@@ -30,30 +30,30 @@ NES Emulator written in C
 - [ ] CMP
 - [ ] CPX
 - [ ] CPY
-- [ ] DEC
-- [ ] DEX
-- [ ] DEY
+- [x] DEC
+- [x] DEX
+- [x] DEY
 - [x] EOR
-- [ ] INC
+- [x] INC
 - [x] INX
-- [ ] INY
+- [x] INY
 - [ ] JMP
 - [ ] JSR
 - [x] LDA
 - [x] LDX
 - [x] LDY
-- [ ] LSR
+- [x] LSR
 - [ ] NOP
 - [x] ORA
 - [ ] PHA
-- [ ] PHP
-- [ ] PLA
-- [ ] PLP
-- [ ] ROL
-- [ ] ROR
+- [x] PHP
+- [x] PLA
+- [x] PLP
+- [x] ROL
+- [x] ROR
 - [ ] RTI
 - [ ] RTS
-- [ ] SBC
+- [x] SBC
 - [ ] SEC
 - [ ] SED
 - [ ] SEI

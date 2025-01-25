@@ -1,68 +1,130 @@
 #include "../headers/cpu.h"
 
 
-OpcodeEntry opcode_table[256] = {
-    [0x29] = {CPU_AND, ADDR_MODE_IMMEDIATE},
-    [0x25] = {CPU_AND, ADDR_MODE_ZERO_PAGE},
-    [0x35] = {CPU_AND, ADDR_MODE_ZERO_PAGE_X},
-    [0x2D] = {CPU_AND, ADDR_MODE_ABSOLUTE},
-    [0x3D] = {CPU_AND, ADDR_MODE_ABSOLUTE_X},
-    [0x39] = {CPU_AND, ADDR_MODE_ABSOLUTE_Y},
-    [0x21] = {CPU_AND, ADDR_MODE_INDIRECT_X},
-    [0x31] = {CPU_AND, ADDR_MODE_INDIRECT_Y},
+OpcodeEntry_t opcode_table[256] = {
+    [0x69] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0x65] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0x75] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0x6D] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0x7D] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
+    [0x79] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
+    [0x61] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0x71] = {.instruction.void_instruction = CPU_ADC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 5},
 
-    [0x49] = {CPU_EOR, ADDR_MODE_IMMEDIATE},
-    [0x45] = {CPU_EOR, ADDR_MODE_ZERO_PAGE},
-    [0x55] = {CPU_EOR, ADDR_MODE_ZERO_PAGE_X},
-    [0x4D] = {CPU_EOR, ADDR_MODE_ABSOLUTE},
-    [0x5D] = {CPU_EOR, ADDR_MODE_ABSOLUTE_X},
-    [0x59] = {CPU_EOR, ADDR_MODE_ABSOLUTE_Y},
-    [0x41] = {CPU_EOR, ADDR_MODE_INDIRECT_X},
-    [0x51] = {CPU_EOR, ADDR_MODE_INDIRECT_Y},
+    [0x29] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0x25] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0x35] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0x2D] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0x3D] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
+    [0x39] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
+    [0x21] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0x31] = {.instruction.void_instruction = CPU_AND, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 5},
 
-    [0xE8] = {CPU_INX, ADDR_MODE_IMPLICIT},
+    [0x0A] = {.instruction.void_instruction = CPU_ASL_ACC,  .type = INSTRUCTION_TYPE_VOID,  .mode = ADDR_MODE_ACCUMULATOR,   .len = 1, .cycles = 2},
+    [0x06] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 5},
+    [0x16] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 6},
+    [0x0E] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 6},
+    [0x06] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 7},
 
-    [0xC8] = {CPU_INY, ADDR_MODE_IMPLICIT},
+    [0xC6] = {.instruction.u8_instruction = CPU_DEC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 5},
+    [0xD6] = {.instruction.u8_instruction = CPU_DEC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 6},
+    [0xCE] = {.instruction.u8_instruction = CPU_DEC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 6},
+    [0xDE] = {.instruction.u8_instruction = CPU_DEC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 7},
 
-    [0xA9] = {CPU_LDA, ADDR_MODE_IMMEDIATE},
-    [0xA5] = {CPU_LDA, ADDR_MODE_ZERO_PAGE},
-    [0xB5] = {CPU_LDA, ADDR_MODE_ZERO_PAGE_X},
-    [0xAD] = {CPU_LDA, ADDR_MODE_ABSOLUTE},
-    [0xBD] = {CPU_LDA, ADDR_MODE_ABSOLUTE_X},
-    [0xB9] = {CPU_LDA, ADDR_MODE_ABSOLUTE_Y},
-    [0xA1] = {CPU_LDA, ADDR_MODE_INDIRECT_X},
-    [0xB1] = {CPU_LDA, ADDR_MODE_INDIRECT_Y},
+    [0xCA] = {.instruction.void_instruction = CPU_DEX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 2},
+
+    [0x88] = {.instruction.void_instruction = CPU_DEY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 2},
+
+    [0x49] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0x45] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0x55] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0x4D] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0x5D] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
+    [0x59] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
+    [0x41] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0x51] = {.instruction.void_instruction = CPU_EOR, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 5},
+
+    [0xE6] = {.instruction.u8_instruction = CPU_INC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 5},
+    [0xF6] = {.instruction.u8_instruction = CPU_INC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 6},
+    [0xEE] = {.instruction.u8_instruction = CPU_INC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 6},
+    [0xFE] = {.instruction.u8_instruction = CPU_INC, .type = INSTRUCTION_TYPE_U8, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 7},
+
+    [0xE8] = {.instruction.void_instruction = CPU_INX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 2},
+
+    [0xC8] = {.instruction.void_instruction = CPU_INY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 2},
+
+    [0xA9] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0xA5] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0xB5] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0xAD] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0xBD] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
+    [0xB9] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
+    [0xA1] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0xB1] = {.instruction.void_instruction = CPU_LDA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 5},
     
-    [0xA2] = {CPU_LDX, ADDR_MODE_IMMEDIATE},
-    [0xA6] = {CPU_LDX, ADDR_MODE_ZERO_PAGE},
-    [0xB6] = {CPU_LDX, ADDR_MODE_ZERO_PAGE_Y},
-    [0xAE] = {CPU_LDX, ADDR_MODE_ABSOLUTE},
-    [0xBE] = {CPU_LDX, ADDR_MODE_ABSOLUTE_Y},
+    [0xA2] = {.instruction.void_instruction = CPU_LDX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0xA6] = {.instruction.void_instruction = CPU_LDX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0xB6] = {.instruction.void_instruction = CPU_LDX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_Y,   .len = 2, .cycles = 4},
+    [0xAE] = {.instruction.void_instruction = CPU_LDX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0xBE] = {.instruction.void_instruction = CPU_LDX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
 
-    [0xA0] = {CPU_LDY, ADDR_MODE_IMMEDIATE},
-    [0xA4] = {CPU_LDY, ADDR_MODE_ZERO_PAGE},
-    [0xB4] = {CPU_LDY, ADDR_MODE_ZERO_PAGE_X},
-    [0xAC] = {CPU_LDY, ADDR_MODE_ABSOLUTE},
-    [0xBC] = {CPU_LDY, ADDR_MODE_ABSOLUTE_X},
+    [0xA0] = {.instruction.void_instruction = CPU_LDY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0xA4] = {.instruction.void_instruction = CPU_LDY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0xB4] = {.instruction.void_instruction = CPU_LDY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0xAC] = {.instruction.void_instruction = CPU_LDY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0xBC] = {.instruction.void_instruction = CPU_LDY, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
 
-    [0x09] = {CPU_ORA, ADDR_MODE_IMMEDIATE},
-    [0x05] = {CPU_ORA, ADDR_MODE_ZERO_PAGE},
-    [0x15] = {CPU_ORA, ADDR_MODE_ZERO_PAGE_X},
-    [0x0D] = {CPU_ORA, ADDR_MODE_ABSOLUTE},
-    [0x1D] = {CPU_ORA, ADDR_MODE_ABSOLUTE_X},
-    [0x19] = {CPU_ORA, ADDR_MODE_ABSOLUTE_Y},
-    [0x01] = {CPU_ORA, ADDR_MODE_INDIRECT_X},
-    [0x11] = {CPU_ORA, ADDR_MODE_INDIRECT_Y},
+    [0x4A] = {.instruction.void_instruction = CPU_LSR_ACC,  .type = INSTRUCTION_TYPE_VOID,  .mode = ADDR_MODE_ACCUMULATOR,   .len = 1, .cycles = 2},
+    [0x46] = {.instruction.u8_instruction   = CPU_LSR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 5},
+    [0x56] = {.instruction.u8_instruction   = CPU_LSR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 6},
+    [0x4E] = {.instruction.u8_instruction   = CPU_LSR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 6},
+    [0x5E] = {.instruction.u8_instruction   = CPU_LSR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 7},
 
-    [0x85] = {CPU_STA, ADDR_MODE_ZERO_PAGE},
-    [0x95] = {CPU_STA, ADDR_MODE_ZERO_PAGE_X},
-    [0x8D] = {CPU_STA, ADDR_MODE_ABSOLUTE},
-    [0x9D] = {CPU_STA, ADDR_MODE_ABSOLUTE_X},
-    [0x99] = {CPU_STA, ADDR_MODE_ABSOLUTE_Y},
-    [0x81] = {CPU_STA, ADDR_MODE_INDIRECT_X},
-    [0x91] = {CPU_STA, ADDR_MODE_INDIRECT_Y},
+    [0x09] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0x05] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0x15] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0x0D] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0x1D] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
+    [0x19] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
+    [0x01] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0x11] = {.instruction.void_instruction = CPU_ORA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 5},
 
-    [0xAA] = {CPU_TAX, ADDR_MODE_IMPLICIT},
+    [0x08] = {.instruction.void_instruction = CPU_PHP, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 3},
+
+    [0x68] = {.instruction.void_instruction = CPU_PLA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 4},
+
+    [0x28] = {.instruction.void_instruction = CPU_PLP, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 4},
+
+    [0x2A] = {.instruction.void_instruction = CPU_ROL_ACC,  .type = INSTRUCTION_TYPE_VOID,  .mode = ADDR_MODE_ACCUMULATOR,   .len = 1, .cycles = 2},
+    [0x26] = {.instruction.u8_instruction   = CPU_ROL,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 5},
+    [0x36] = {.instruction.u8_instruction   = CPU_ROL,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 6},
+    [0x2E] = {.instruction.u8_instruction   = CPU_ROL,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 6},
+    [0x3E] = {.instruction.u8_instruction   = CPU_ROL,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 7},
+
+    [0x6A] = {.instruction.void_instruction = CPU_ROR_ACC,  .type = INSTRUCTION_TYPE_VOID,  .mode = ADDR_MODE_ACCUMULATOR,   .len = 1, .cycles = 2},
+    [0x66] = {.instruction.u8_instruction   = CPU_ROR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 5},
+    [0x76] = {.instruction.u8_instruction   = CPU_ROR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 6},
+    [0x6E] = {.instruction.u8_instruction   = CPU_ROR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 6},
+    [0x7E] = {.instruction.u8_instruction   = CPU_ROR,      .type = INSTRUCTION_TYPE_U8,    .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 7},
+
+    [0xE9] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMMEDIATE,     .len = 2, .cycles = 2},
+    [0xE5] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0xF5] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0xED] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0xFD] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 4},
+    [0xF9] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 4},
+    [0xE1] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0xF1] = {.instruction.void_instruction = CPU_SBC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 5},
+
+    [0x85] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE,     .len = 2, .cycles = 3},
+    [0x95] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ZERO_PAGE_X,   .len = 2, .cycles = 4},
+    [0x8D] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE,      .len = 3, .cycles = 4},
+    [0x9D] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_X,    .len = 3, .cycles = 5},
+    [0x99] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_ABSOLUTE_Y,    .len = 3, .cycles = 5},
+    [0x81] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_X,    .len = 2, .cycles = 6},
+    [0x91] = {.instruction.void_instruction = CPU_STA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_INDIRECT_Y,    .len = 2, .cycles = 6},
+
+    [0xAA] = {.instruction.void_instruction = CPU_TAX, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,      .len = 1, .cycles = 2},
 };
 
 CPU_t* CPU_init() {
@@ -83,7 +145,6 @@ void CPU_free(CPU_t* cpu) {
 }
 
 uint8_t CPU_mem_read_u8(CPU_t* cpu, uint16_t addr) {
-    cpu->pc++;
     return cpu->memory[addr];
 }
 
@@ -91,8 +152,17 @@ void CPU_mem_write_u8(CPU_t* cpu, uint16_t addr, uint8_t data) {
     cpu->memory[addr] = data;
 }
 
+uint8_t CPU_stack_pop_u8(CPU_t* cpu) {
+    cpu->stack_pointer++;
+    return CPU_mem_read_u8(cpu, STACK + cpu->stack_pointer);
+}
+
+void CPU_stack_push_u8(CPU_t* cpu, uint8_t data) {
+    CPU_mem_write_u8(cpu, STACK + cpu->stack_pointer, data);
+    cpu->stack_pointer--;
+}
+
 uint16_t CPU_mem_read_u16(CPU_t* cpu, uint16_t addr) {
-    cpu->pc += 2;
     uint16_t lo = CPU_mem_read_u8(cpu, addr);
     uint16_t hi = CPU_mem_read_u8(cpu, addr+1);
     return (hi<<8) | lo;
@@ -103,6 +173,18 @@ void CPU_mem_write_u16(CPU_t* cpu, uint16_t addr, uint16_t data) {
     uint8_t lo = data & 0xFF;
     CPU_mem_write_u8(cpu, addr, lo);
     CPU_mem_write_u8(cpu, addr+1, hi);
+}
+
+uint16_t CPU_stack_pop_u16(CPU_t* cpu) {
+    uint8_t lo = CPU_stack_pop_u8(cpu), hi = CPU_stack_pop_u8(cpu);
+    return (hi<<8) | lo;
+}
+
+void CPU_stack_push_u16(CPU_t* cpu, uint16_t data) {
+    uint8_t hi = data >> 8;
+    uint8_t lo = data & 0xFF;
+    CPU_stack_push_u8(cpu, hi);
+    CPU_stack_push_u8(cpu, lo);
 }
 
 uint16_t CPU_get_operand_addr(CPU_t* cpu, AddressingMode_t mode) {
@@ -172,19 +254,69 @@ void CPU_load(CPU_t* cpu, uint8_t* program, size_t program_size) {
 void CPU_run(CPU_t* cpu) {
     for (;;) {
         uint8_t opcode = CPU_mem_read_u8(cpu, cpu->pc);
+        cpu->pc++;
+        uint16_t pc_state = cpu->pc;
 
         if (opcode == 0x00) return;
 
-        OpcodeEntry entry = opcode_table[opcode];
-        if (entry.instruction != NULL) {
-            entry.instruction(cpu, entry.mode);
+        OpcodeEntry_t entry = opcode_table[opcode];
+        switch (entry.type) {
+        case INSTRUCTION_TYPE_VOID:
+            entry.instruction.void_instruction(cpu, entry.mode);
+            break;
+        case INSTRUCTION_TYPE_U8:
+            entry.instruction.u8_instruction(cpu, entry.mode);
+            break;
+        default:
+            printf("Unknown instruction type\n");
+            exit(EXIT_FAILURE);
+            break;
         }
-        else {
-            printf("Unknown or unimplemented instruction (skipped)\n");   
+
+        if (pc_state == cpu->pc) {
+            cpu->pc += (uint16_t) entry.len - 1;
         }
     }
 }
 
+
+void CPU_ADC(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    CPU_add_to_register_a(cpu, value);
+}
+
+uint8_t CPU_ASL(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+
+    if ((data >> 7) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = data << 1;
+
+    CPU_mem_write_u8(cpu, addr, data);
+    CPU_update_zero_and_negative_flags(cpu, data);
+    return data;
+}
+
+void CPU_ASL_ACC(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t data = cpu->reg_a;
+
+    if ((data >> 7) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = data << 1;
+    CPU_set_register_a(cpu, data);
+}
 
 void CPU_AND(CPU_t* cpu, AddressingMode_t mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
@@ -192,11 +324,50 @@ void CPU_AND(CPU_t* cpu, AddressingMode_t mode) {
     CPU_set_register_a(cpu, cpu->reg_a & value);
 }
 
+uint8_t CPU_DEC(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+    data--;
+    CPU_mem_write_u8(cpu, addr, data);
+    CPU_update_zero_and_negative_flags(cpu, data);
+    return data;
+}
+
+void CPU_DEX(CPU_t* cpu, AddressingMode_t mode) {
+    cpu->reg_x--;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
+}
+
+void CPU_DEY(CPU_t* cpu, AddressingMode_t mode) {
+    cpu->reg_y--;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_y);
+}
+
 void CPU_EOR(CPU_t* cpu, AddressingMode_t mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
     uint8_t value = CPU_mem_read_u8(cpu, addr);
     CPU_set_register_a(cpu, cpu->reg_a ^ value);
 }
+
+uint8_t CPU_INC(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+    data++;
+    CPU_mem_write_u8(cpu, addr, data);
+    CPU_update_zero_and_negative_flags(cpu, data);
+    return data;
+}
+
+void CPU_INX(CPU_t* cpu, AddressingMode_t mode) {
+    cpu->reg_x++;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
+}
+
+void CPU_INY(CPU_t* cpu, AddressingMode_t mode) {
+    cpu->reg_y++;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_y);
+}
+
 
 void CPU_LDA(CPU_t* cpu, AddressingMode_t mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
@@ -220,10 +391,129 @@ void CPU_LDY(CPU_t* cpu, AddressingMode_t mode) {
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_y);
 }
 
+uint8_t CPU_LSR(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+
+    if ((data & 0x01) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = data >> 1;
+    CPU_mem_write_u8(cpu, addr, data);
+    CPU_update_zero_and_negative_flags(cpu, data);
+    return data;
+}
+
+void CPU_LSR_ACC(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t data = cpu->reg_a;
+
+    if ((data & 0x01) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = data >> 1;
+    CPU_set_register_a(cpu, data);
+}
+
 void CPU_ORA(CPU_t* cpu, AddressingMode_t mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
     uint8_t value = CPU_mem_read_u8(cpu, addr);
     CPU_set_register_a(cpu, cpu->reg_a | value);
+}
+
+void CPU_PHP(CPU_t* cpu, AddressingMode_t mode) {
+    CPU_stack_push_u8(cpu, cpu->status | BREAK | BREAK2);
+}
+
+void CPU_PLA(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t data = CPU_stack_pop_u8(cpu);
+    CPU_set_register_a(cpu, data);
+}
+
+void CPU_PLP(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t data = CPU_stack_pop_u8(cpu);
+    cpu->status = data;
+    CPU_clear_status_flag(cpu, BREAK);
+    CPU_set_status_flag(cpu, BREAK2);
+}
+
+uint8_t CPU_ROL(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+    uint8_t carry = CPU_get_status_flag(cpu, CARRY_FLAG);
+
+    if ((data >> 7) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = (data << 1) | carry;
+    CPU_mem_write_u8(cpu, addr, data);
+    CPU_update_zero_and_negative_flags(cpu, data);
+    return data;
+}
+
+void CPU_ROL_ACC(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t data = cpu->reg_a;
+    uint8_t carry = CPU_get_status_flag(cpu, CARRY_FLAG);
+
+    if ((data >> 7) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = (data << 1) | carry;
+    CPU_set_register_a(cpu, data);
+}
+
+uint8_t CPU_ROR(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+    uint8_t carry = CPU_get_status_flag(cpu, CARRY_FLAG);
+
+    if ((data & 0x01) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = (data >> 1) | (carry << 7);
+    CPU_mem_write_u8(cpu, addr, data);
+    CPU_update_zero_and_negative_flags(cpu, data);
+    return data;
+}
+
+void CPU_ROR_ACC(CPU_t* cpu, AddressingMode_t mode) {
+    uint8_t data = cpu->reg_a;
+    uint8_t carry = CPU_get_status_flag(cpu, CARRY_FLAG);
+
+    if ((data & 0x01) == 1) {
+        CPU_set_status_flag(cpu, CARRY_FLAG);
+    }
+    else {
+        CPU_clear_status_flag(cpu, CARRY_FLAG);
+    }
+
+    data = (data >> 1) | (carry << 7);
+    CPU_set_register_a(cpu, data);
+}
+
+void CPU_SBC(CPU_t* cpu, AddressingMode_t mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t value = CPU_mem_read_u8(cpu, addr);
+    CPU_add_to_register_a(cpu, ~value);
 }
 
 void CPU_STA(CPU_t* cpu, AddressingMode_t mode) {
@@ -231,21 +521,15 @@ void CPU_STA(CPU_t* cpu, AddressingMode_t mode) {
     CPU_mem_write_u8(cpu, addr, cpu->reg_a);
 }
 
-void CPU_TAX(CPU_t* cpu) {
+void CPU_TAX(CPU_t* cpu, AddressingMode_t mode) {
     cpu->reg_x = cpu->reg_a;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
 }
 
-void CPU_INX(CPU_t* cpu) {
-    cpu->reg_x++;
-    CPU_update_zero_and_negative_flags(cpu, cpu->reg_x);
-}
 
-void CPU_INY(CPU_t* cpu) {
-    cpu->reg_y++;
-    CPU_update_zero_and_negative_flags(cpu, cpu->reg_y);
+uint8_t CPU_get_status_flag(CPU_t* cpu, StatusFlag_t flag) {
+    return (cpu->status & flag) != 0;
 }
-
 
 void CPU_set_status_flag(CPU_t* cpu, StatusFlag_t flag) {
     cpu->status |= flag;

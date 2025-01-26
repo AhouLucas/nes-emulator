@@ -46,9 +46,11 @@ typedef enum {
     ADDR_MODE_ZERO_PAGE,
     ADDR_MODE_ZERO_PAGE_X,
     ADDR_MODE_ZERO_PAGE_Y,
+    ADDR_MODE_RELATIVE,
     ADDR_MODE_ABSOLUTE,
     ADDR_MODE_ABSOLUTE_X,
     ADDR_MODE_ABSOLUTE_Y,
+    ADDR_MODE_INDIRECT,
     ADDR_MODE_INDIRECT_X,
     ADDR_MODE_INDIRECT_Y,
     ADDR_MODE_IMPLICIT,
@@ -113,6 +115,22 @@ void CPU_ADC(CPU_t*, AddressingMode_t);
 void CPU_AND(CPU_t*, AddressingMode_t);
 uint8_t CPU_ASL(CPU_t*, AddressingMode_t);
 void CPU_ASL_ACC(CPU_t*, AddressingMode_t);
+void CPU_BCC(CPU_t*, AddressingMode_t);
+void CPU_BCS(CPU_t*, AddressingMode_t);
+void CPU_BEQ(CPU_t*, AddressingMode_t);
+void CPU_BIT(CPU_t*, AddressingMode_t);
+void CPU_BMI(CPU_t*, AddressingMode_t);
+void CPU_BNE(CPU_t*, AddressingMode_t);
+void CPU_BPL(CPU_t*, AddressingMode_t);
+void CPU_BVC(CPU_t*, AddressingMode_t);
+void CPU_BVS(CPU_t*, AddressingMode_t);
+void CPU_CLC(CPU_t*, AddressingMode_t);
+void CPU_CLD(CPU_t*, AddressingMode_t);
+void CPU_CLI(CPU_t*, AddressingMode_t);
+void CPU_CLV(CPU_t*, AddressingMode_t);
+void CPU_CMP(CPU_t*, AddressingMode_t);
+void CPU_CPX(CPU_t*, AddressingMode_t);
+void CPU_CPY(CPU_t*, AddressingMode_t);
 uint8_t CPU_DEC(CPU_t*, AddressingMode_t);
 void CPU_DEX(CPU_t*, AddressingMode_t);
 void CPU_DEY(CPU_t*, AddressingMode_t);
@@ -120,12 +138,16 @@ void CPU_EOR(CPU_t*, AddressingMode_t);
 uint8_t CPU_INC(CPU_t*, AddressingMode_t);
 void CPU_INX(CPU_t*, AddressingMode_t);
 void CPU_INY(CPU_t*, AddressingMode_t);
+void CPU_JMP(CPU_t*, AddressingMode_t);
+void CPU_JSR(CPU_t*, AddressingMode_t);
 void CPU_LDA(CPU_t*, AddressingMode_t);
 void CPU_LDX(CPU_t*, AddressingMode_t);
 void CPU_LDY(CPU_t*, AddressingMode_t);
 uint8_t CPU_LSR(CPU_t*, AddressingMode_t);
 void CPU_LSR_ACC(CPU_t*, AddressingMode_t);
+void CPU_NOP(CPU_t*, AddressingMode_t);
 void CPU_ORA(CPU_t*, AddressingMode_t);
+void CPU_PHA(CPU_t*, AddressingMode_t);
 void CPU_PHP(CPU_t*, AddressingMode_t);
 void CPU_PLA(CPU_t*, AddressingMode_t);
 void CPU_PLP(CPU_t*, AddressingMode_t);
@@ -133,11 +155,23 @@ uint8_t CPU_ROL(CPU_t*, AddressingMode_t);
 void CPU_ROL_ACC(CPU_t*, AddressingMode_t);
 uint8_t CPU_ROR(CPU_t*, AddressingMode_t);
 void CPU_ROR_ACC(CPU_t*, AddressingMode_t);
+void CPU_RTI(CPU_t*, AddressingMode_t);
+void CPU_RTS(CPU_t*, AddressingMode_t);
 void CPU_SBC(CPU_t*, AddressingMode_t);
+void CPU_SEC(CPU_t*, AddressingMode_t);
+void CPU_SED(CPU_t*, AddressingMode_t);
+void CPU_SEI(CPU_t*, AddressingMode_t);
 void CPU_STA(CPU_t*, AddressingMode_t);
+void CPU_STX(CPU_t*, AddressingMode_t);
+void CPU_STY(CPU_t*, AddressingMode_t);
 void CPU_TAX(CPU_t*, AddressingMode_t);
+void CPU_TAY(CPU_t*, AddressingMode_t);
+void CPU_TSX(CPU_t*, AddressingMode_t);
+void CPU_TXA(CPU_t*, AddressingMode_t);
+void CPU_TXS(CPU_t*, AddressingMode_t);
+void CPU_TYA(CPU_t*, AddressingMode_t);
 
-// CPU state functions
+// CPU instructions helpers
 
 uint8_t CPU_get_status_flag(CPU_t*, StatusFlag_t);
 void CPU_set_status_flag(CPU_t*, StatusFlag_t);
@@ -145,6 +179,8 @@ void CPU_clear_status_flag(CPU_t*, StatusFlag_t);
 void CPU_update_zero_and_negative_flags(CPU_t*, uint8_t);
 void CPU_set_register_a(CPU_t*, uint8_t);
 void CPU_add_to_register_a(CPU_t*, uint8_t);
+void CPU_compare(CPU_t*, AddressingMode_t, uint8_t);
+void CPU_branch(CPU_t*, bool);
 
 /* End Instruction processing */
 #endif

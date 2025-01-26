@@ -13,23 +13,23 @@ NES Emulator written in C
 - [x] ADC
 - [x] AND
 - [x] ASL
-- [ ] BCC
-- [ ] BCS
-- [ ] BEQ
-- [ ] BIT
-- [ ] BMI
-- [ ] BNE
-- [ ] BPL
-- [ ] BRK
-- [ ] BVC
-- [ ] BVS
-- [ ] CLC
-- [ ] CLD
-- [ ] CLI
-- [ ] CLV
-- [ ] CMP
-- [ ] CPX
-- [ ] CPY
+- [x] BCC
+- [x] BCS
+- [x] BEQ
+- [x] BIT
+- [x] BMI
+- [x] BNE
+- [x] BPL
+- [x] BRK
+- [x] BVC
+- [x] BVS
+- [x] CLC
+- [x] CLD
+- [x] CLI
+- [x] CLV
+- [x] CMP
+- [x] CPX
+- [x] CPY
 - [x] DEC
 - [x] DEX
 - [x] DEY
@@ -37,32 +37,32 @@ NES Emulator written in C
 - [x] INC
 - [x] INX
 - [x] INY
-- [ ] JMP
-- [ ] JSR
+- [x] JMP
+- [x] JSR
 - [x] LDA
 - [x] LDX
 - [x] LDY
 - [x] LSR
-- [ ] NOP
+- [x] NOP
 - [x] ORA
-- [ ] PHA
+- [x] PHA
 - [x] PHP
 - [x] PLA
 - [x] PLP
 - [x] ROL
 - [x] ROR
-- [ ] RTI
-- [ ] RTS
+- [x] RTI
+- [x] RTS
 - [x] SBC
-- [ ] SEC
-- [ ] SED
-- [ ] SEI
+- [x] SEC
+- [x] SED
+- [x] SEI
 - [x] STA
-- [ ] STX
-- [ ] STY
+- [x] STX
+- [x] STY
 - [x] TAX
-- [ ] TAY
-- [ ] TSX
-- [ ] TXA
-- [ ] TXS
-- [ ] TYA
+- [x] TAY
+- [x] TSX
+- [x] TXA
+- [x] TXS
+- [x] TYA

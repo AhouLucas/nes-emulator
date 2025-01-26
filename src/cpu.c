@@ -210,27 +210,27 @@ OpcodeEntry_t opcode_table[256] = {
 
 CPU_t* CPU_init() {
     CPU_t* cpu = malloc(sizeof(CPU_t));
-    cpu->memory = malloc(sizeof(uint8_t)*0xFFFF);
     cpu->reg_a = 0;
     cpu->reg_x = 0;
     cpu->pc = 0;
     cpu->status = 0;
     cpu->stack_pointer = STACK_RESET;
+    cpu->bus = Bus_init();
     return cpu;
 }
 
 void CPU_free(CPU_t* cpu) {
-    free(cpu->memory);
+    Bus_free(cpu->bus);
     free(cpu);
     return;
 }
 
 uint8_t CPU_mem_read_u8(CPU_t* cpu, uint16_t addr) {
-    return cpu->memory[addr];
+    return Bus_mem_read_u8(cpu->bus, addr);
 }
 
 void CPU_mem_write_u8(CPU_t* cpu, uint16_t addr, uint8_t data) {
-    cpu->memory[addr] = data;
+    Bus_mem_write_u8(cpu->bus, addr, data);
 }
 
 uint8_t CPU_stack_pop_u8(CPU_t* cpu) {
@@ -244,16 +244,11 @@ void CPU_stack_push_u8(CPU_t* cpu, uint8_t data) {
 }
 
 uint16_t CPU_mem_read_u16(CPU_t* cpu, uint16_t addr) {
-    uint16_t lo = CPU_mem_read_u8(cpu, addr);
-    uint16_t hi = CPU_mem_read_u8(cpu, addr+1);
-    return (hi<<8) | lo;
+    return Bus_mem_read_u16(cpu->bus, addr);
 }
 
 void CPU_mem_write_u16(CPU_t* cpu, uint16_t addr, uint16_t data) {
-    uint8_t hi = data>>8;
-    uint8_t lo = data & 0xFF;
-    CPU_mem_write_u8(cpu, addr, lo);
-    CPU_mem_write_u8(cpu, addr+1, hi);
+    Bus_mem_write_u16(cpu->bus, addr, data);
 }
 
 uint16_t CPU_stack_pop_u16(CPU_t* cpu) {
@@ -328,7 +323,9 @@ void CPU_load_and_run(CPU_t* cpu, uint8_t* program, size_t program_size) {
 }
 
 void CPU_load(CPU_t* cpu, uint8_t* program, size_t program_size) {
-    memcpy(cpu->memory+0x8000, program, program_size);
+    for (uint16_t i = 0; i < program_size; i++) {
+        CPU_mem_write_u8(cpu, 0x0000 + i, program[i]);
+    }
     CPU_mem_write_u16(cpu, 0xFFFC, 0x8000);
 }
 

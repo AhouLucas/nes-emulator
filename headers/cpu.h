@@ -1,7 +1,6 @@
-#ifndef CPU_H
-#define CPU_H
-
+#pragma once
 #include "common.h"
+#include "bus.h"
 
 
 /// # Status Register (P) http://wiki.nesdev.com/w/index.php/Status_flags
@@ -18,13 +17,13 @@
 ///
 
 typedef struct CPU {
-    uint8_t* memory;
     uint16_t pc;
     uint8_t status;
     uint8_t stack_pointer;
     uint8_t reg_a;
     uint8_t reg_x;
     uint8_t reg_y;
+    Bus_t* bus;
 } CPU_t;
 
 
@@ -59,7 +58,7 @@ typedef enum {
 
 /* Initialization */
 
-CPU_t*  CPU_init(void);
+CPU_t*  CPU_init();
 void    CPU_free(CPU_t*);
 
 /* End initialization */
@@ -85,10 +84,12 @@ typedef struct OpcodeEntry {
     uint8_t             cycles;
 } OpcodeEntry_t;
 
+extern OpcodeEntry_t opcode_table[256];
+
 // Read-Write helpers
 
-const uint16_t  STACK       = 0x0100;
-const uint8_t   STACK_RESET = 0x00FD;
+static const uint16_t  STACK       = 0x0100;
+static const uint8_t   STACK_RESET = 0x00FD;
 
 uint8_t     CPU_mem_read_u8(CPU_t*, uint16_t);
 void        CPU_mem_write_u8(CPU_t*, uint16_t, uint8_t);
@@ -183,4 +184,3 @@ void CPU_compare(CPU_t*, AddressingMode_t, uint8_t);
 void CPU_branch(CPU_t*, bool);
 
 /* End Instruction processing */
-#endif

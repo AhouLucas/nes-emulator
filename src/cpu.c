@@ -24,7 +24,7 @@ OpcodeEntry_t opcode_table[256] = {
     [0x06] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ZERO_PAGE,    .len = 2, .cycles = 5},
     [0x16] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ZERO_PAGE_X,  .len = 2, .cycles = 6},
     [0x0E] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ABSOLUTE,     .len = 3, .cycles = 6},
-    [0x06] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ABSOLUTE_X,   .len = 3, .cycles = 7},
+    [0x1E] = {.instruction.u8_instruction   = CPU_ASL,      .type = INSTRUCTION_TYPE_U8  ,  .mode = ADDR_MODE_ABSOLUTE_X,   .len = 3, .cycles = 7},
 
     [0x90] = {.instruction.void_instruction = CPU_BCC, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_RELATIVE,   .len = 2, .cycles = 2},
 
@@ -208,14 +208,15 @@ OpcodeEntry_t opcode_table[256] = {
     [0x98] = {.instruction.void_instruction = CPU_TYA, .type = INSTRUCTION_TYPE_VOID, .mode = ADDR_MODE_IMPLICIT,   .len = 1, .cycles = 2},
 };
 
-CPU_t* CPU_init() {
+CPU_t* CPU_init(Bus_t* bus) {
     CPU_t* cpu = malloc(sizeof(CPU_t));
     cpu->reg_a = 0;
     cpu->reg_x = 0;
     cpu->pc = 0;
-    cpu->status = 0;
+    cpu->status = 0b100100;
     cpu->stack_pointer = STACK_RESET;
-    cpu->bus = Bus_init();
+
+    cpu->bus = bus;
     return cpu;
 }
 
@@ -265,54 +266,64 @@ void CPU_stack_push_u16(CPU_t* cpu, uint16_t data) {
 
 uint16_t CPU_get_operand_addr(CPU_t* cpu, AddressingMode_t mode) {
     uint8_t pos;
-    uint16_t base;
+    uint8_t base8;
+    uint16_t base16;
     uint8_t lo, hi;
-    uint8_t ptr;
+    uint16_t ptr;
     uint16_t deref_base;
 
-    switch (mode)
-    {
-    case ADDR_MODE_IMMEDIATE:
-        return cpu->pc;
-    case ADDR_MODE_ZERO_PAGE:
-        return CPU_mem_read_u16(cpu, cpu->pc);
-    case ADDR_MODE_ABSOLUTE:
-        return CPU_mem_read_u16(cpu, cpu->pc);
-    case ADDR_MODE_ZERO_PAGE_X:
-        pos = CPU_mem_read_u8(cpu, cpu->pc);
-        return pos + cpu->reg_x;
-    case ADDR_MODE_ZERO_PAGE_Y:
-        pos = CPU_mem_read_u8(cpu, cpu->pc);
-        return pos + cpu->reg_y;
-    case ADDR_MODE_ABSOLUTE_X:
-        base = CPU_mem_read_u16(cpu, cpu->pc);
-        return base + ((uint16_t)cpu->reg_x);
-    case ADDR_MODE_ABSOLUTE_Y:
-        base = CPU_mem_read_u16(cpu, cpu->pc);
-        return base + ((uint16_t)cpu->reg_y);
-    case ADDR_MODE_INDIRECT_X:
-        base = CPU_mem_read_u8(cpu, cpu->pc);
-        ptr = (uint8_t)base + cpu->reg_x;
-        lo = CPU_mem_read_u8(cpu, ptr);
-        hi = CPU_mem_read_u8(cpu, ptr+1);
-        return ((uint16_t) hi)<<8 | ((uint16_t) lo);
-    case ADDR_MODE_INDIRECT_Y:
-        base = CPU_mem_read_u8(cpu, cpu->pc);
-        lo = CPU_mem_read_u8(cpu, base);
-        hi = CPU_mem_read_u8(cpu, base+1);
-        deref_base = ((uint16_t) hi)<<8 | ((uint16_t) lo);
-        return deref_base + ((uint16_t) cpu->reg_y);
-    default:
-        printf("Unknown Addressing mode\n");
-        exit(EXIT_FAILURE);
-        break;
+    switch (mode) {
+        case ADDR_MODE_IMMEDIATE:
+            return cpu->pc;
+
+        case ADDR_MODE_ZERO_PAGE:
+            return CPU_mem_read_u8(cpu, cpu->pc);
+
+        case ADDR_MODE_ABSOLUTE:
+            return CPU_mem_read_u16(cpu, cpu->pc);
+
+        case ADDR_MODE_ZERO_PAGE_X:
+            pos = CPU_mem_read_u8(cpu, cpu->pc);
+            return (pos + cpu->reg_x) & 0xFF; // Ensure zero page wrap-around
+
+        case ADDR_MODE_ZERO_PAGE_Y:
+            pos = CPU_mem_read_u8(cpu, cpu->pc);
+            return (pos + cpu->reg_y) & 0xFF; // Ensure zero page wrap-around
+
+        case ADDR_MODE_ABSOLUTE_X:
+            base16 = CPU_mem_read_u16(cpu, cpu->pc);
+            return base16 + cpu->reg_x;
+
+        case ADDR_MODE_ABSOLUTE_Y:
+            base16 = CPU_mem_read_u16(cpu, cpu->pc);
+            return base16 + cpu->reg_y;
+
+        case ADDR_MODE_INDIRECT_X:
+            base8 = CPU_mem_read_u8(cpu, cpu->pc);
+            ptr = (base8 + cpu->reg_x) & 0xFF; // Ensure zero page wrap-around
+            lo = CPU_mem_read_u8(cpu, ptr);
+            hi = CPU_mem_read_u8(cpu, (ptr + 1) & 0xFF); // Ensure zero page wrap-around
+            return ((uint16_t)hi << 8) | lo;
+
+        case ADDR_MODE_INDIRECT_Y:
+            base8 = CPU_mem_read_u8(cpu, cpu->pc);
+            lo = CPU_mem_read_u8(cpu, base8);
+            hi = CPU_mem_read_u8(cpu, (base8 + 1) & 0xFF); // Ensure zero page wrap-around
+            deref_base = ((uint16_t)hi << 8) | lo;
+            return deref_base + cpu->reg_y;
+
+        default:
+            fprintf(stderr, "Unsupported addressing mode: %d\n", mode);
+            exit(EXIT_FAILURE);
     }
 }
 
 void CPU_reset(CPU_t* cpu) {
     cpu->reg_a = 0;
     cpu->reg_x = 0;
-    cpu->status = 0;
+    cpu->reg_y = 0;
+    cpu->status = 0b100100;
+    cpu->stack_pointer = STACK_RESET;
     cpu->pc = CPU_mem_read_u16(cpu, 0xFFFC);
 }
 
@@ -394,6 +405,7 @@ void CPU_ASL_ACC(CPU_t* cpu, AddressingMode_t mode) {
     }
 
     data = data << 1;
+
     CPU_set_register_a(cpu, data);
 }
 
@@ -427,14 +439,14 @@ void CPU_BIT(CPU_t* cpu, AddressingMode_t mode) {
         CPU_clear_status_flag(cpu, ZERO_FLAG);
     }
 
-    if ((data & 0b10000000) == 1) {
+    if ((data & 0b10000000) > 0) {
         CPU_set_status_flag(cpu, NEGATIVE_FLAG);
     }
     else {
         CPU_clear_status_flag(cpu, NEGATIVE_FLAG);
     }
 
-    if ((data & 0b01000000) == 1) {
+    if ((data & 0b01000000) > 0) {
         CPU_set_status_flag(cpu, OVERFLOW_FLAG);
     }
     else {
@@ -566,9 +578,7 @@ void CPU_JSR(CPU_t* cpu, AddressingMode_t mode) {
 void CPU_LDA(CPU_t* cpu, AddressingMode_t mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
     uint8_t value = CPU_mem_read_u8(cpu, addr);
-
-    cpu->reg_a = value;
-    CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
+    CPU_set_register_a(cpu, value);
 }
 
 void CPU_LDX(CPU_t* cpu, AddressingMode_t mode) {

@@ -88,8 +88,8 @@ extern OpcodeEntry_t opcode_table[256];
 
 // Read-Write helpers
 
-static const uint16_t  STACK       = 0x0100;
-static const uint8_t   STACK_RESET = 0x00FD;
+#define STACK       0x0100
+#define STACK_RESET 0x00FD
 
 uint8_t     CPU_mem_read_u8(CPU_t*, uint16_t);
 void        CPU_mem_write_u8(CPU_t*, uint16_t, uint8_t);

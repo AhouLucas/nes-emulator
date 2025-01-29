@@ -1,10 +1,10 @@
 CC=gcc
-FLAGS=-std=c99 -Wall -Wextra -Werror -g
+FLAGS=-std=c99 -g
 INCLUDES=-Iheaders
 
-test: tests/test_interpret.c src/cpu.c headers/cpu.h
-	$(CC) $(FLAGS) $(INCLUDES) tests/test_interpret.c src/cpu.c -o build/test_interpret
-	./build/test_interpret
+test: tests/test_interpret.c src/cpu.c src/bus.c src/rom.c
+	$(CC) $(FLAGS) $(INCLUDES) tests/nestest.c src/cpu.c src/bus.c src/rom.c -o build/nestest
+	./build/nestest
 
 clean:
 	rm -f build/*

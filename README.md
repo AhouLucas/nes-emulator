@@ -9,3 +9,5 @@ NES Emulator written in C
 - http://www.6502.org/tutorials/6502opcodes.html
 
 ## TODO
+
+- [ ] Implement unofficial instructions

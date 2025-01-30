@@ -9,17 +9,17 @@ typedef enum {
     VERTICAL,
     HORIZONTAL,
     FOUR_SCREEN,
-} Mirroring_t;
+} Mirroring;
 
-typedef struct ROM {
+typedef struct {
     uint8_t* prg_ROM;
     uint8_t* chr_ROM;
     size_t prg_rom_size;
     size_t chr_rom_size;
     uint8_t mapper;
-    Mirroring_t screen_mirroring;
-} ROM_t;
+    Mirroring screen_mirroring;
+} ROM;
 
 
-ROM_t* ROM_init(uint8_t*);
-void ROM_free(ROM_t*);
+ROM* ROM_init(uint8_t*);
+void ROM_free(ROM*);

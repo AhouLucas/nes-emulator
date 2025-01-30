@@ -1,6 +1,6 @@
 #include "../headers/rom.h"
 
-ROM_t* ROM_init(uint8_t* raw) {
+ROM* ROM_init(uint8_t* raw) {
     for (int i = 0; i < 4; i++) {
         if (raw[i] != NES_TAG[i]) {
             printf("Error invalid ROM : File is not in iNES file format\n");
@@ -18,7 +18,7 @@ ROM_t* ROM_init(uint8_t* raw) {
 
     bool four_screen = (raw[6] & 0b1000) != 0;
     bool vertical_mirroring = (raw[6] & 0b1) != 0;
-    Mirroring_t screen_mirroring;
+    Mirroring screen_mirroring;
     if (four_screen) screen_mirroring = FOUR_SCREEN;
     else if (!four_screen && vertical_mirroring) screen_mirroring = VERTICAL;
     else if (!four_screen && !vertical_mirroring) screen_mirroring = HORIZONTAL;
@@ -31,7 +31,7 @@ ROM_t* ROM_init(uint8_t* raw) {
     size_t prg_rom_start = 16 + (skip_trainer ? 512 : 0);
     size_t chr_rom_start = prg_rom_start + prg_rom_size;
 
-    ROM_t* rom = malloc(sizeof(ROM_t));
+    ROM* rom = malloc(sizeof(ROM));
 
     rom->prg_ROM = malloc(sizeof(uint8_t) * prg_rom_size);
     rom->chr_ROM = malloc(sizeof(uint8_t) * chr_rom_size);
@@ -45,7 +45,7 @@ ROM_t* ROM_init(uint8_t* raw) {
     return rom;
 }
 
-void ROM_free(ROM_t* rom) {
+void ROM_free(ROM* rom) {
     free(rom->prg_ROM);
     free(rom->chr_ROM);
     free(rom);

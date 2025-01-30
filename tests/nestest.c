@@ -49,27 +49,16 @@ int parse_log_line(const char *line, expected_state *state) {
 
 
 // Function to execute the next instruction in the nestest suite
-void nes_step(CPU_t* cpu) {
+void nes_step(CPU* cpu) {
     uint8_t opcode = CPU_mem_read_u8(cpu, cpu->pc);
     cpu->pc++;
     uint16_t pc_state = cpu->pc;
 
     if (opcode == 0x00) return;
 
-    OpcodeEntry_t entry = opcode_table[opcode];
+    OpcodeEntry entry = opcode_table[opcode];
 
-    switch (entry.type) {
-    case INSTRUCTION_TYPE_VOID:
-        entry.instruction.void_instruction(cpu, entry.mode);
-        break;
-    case INSTRUCTION_TYPE_U8:
-        entry.instruction.u8_instruction(cpu, entry.mode);
-        break;
-    default:
-        printf("Unknown instruction type\n");
-        exit(EXIT_FAILURE);
-        break;
-    }
+    entry.instruction(cpu, entry.mode);
 
     if (pc_state == cpu->pc) {
         cpu->pc += (uint16_t) entry.len - 1;
@@ -123,9 +112,9 @@ void run_nestest(const char *log_file_path) {
     fclose(rom_file);
 
     // Initialize the bus and load the ROM
-    ROM_t *rom = ROM_init(rom_data);
-    Bus_t *bus = Bus_init(rom);
-    CPU_t *cpu = CPU_init(bus);
+    ROM *rom = ROM_init(rom_data);
+    Bus *bus = Bus_init(rom);
+    CPU *cpu = CPU_init(bus);
 
     // Load the program into the CPU and reset it
     CPU_reset(cpu);

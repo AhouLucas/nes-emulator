@@ -144,6 +144,15 @@ OpcodeEntry opcode_table[256] = {
 
     [0x20] = {.instruction = CPU_JSR, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 6},
 
+    [0xBB] = {.instruction = CPU_LAS, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 4},
+
+    [0xA7] = {.instruction = CPU_LAX, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 3},
+    [0xB7] = {.instruction = CPU_LAX, .mode = ADDR_MODE_ZERO_PAGE_Y,    .len = 2, .cycles = 4},
+    [0xAF] = {.instruction = CPU_LAX, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 4},
+    [0xBF] = {.instruction = CPU_LAX, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 4},
+    [0xA3] = {.instruction = CPU_LAX, .mode = ADDR_MODE_INDIRECT_X,     .len = 2, .cycles = 6},
+    [0xB3] = {.instruction = CPU_LAX, .mode = ADDR_MODE_INDIRECT_Y,     .len = 2, .cycles = 5},
+
     [0xA9] = {.instruction = CPU_LDA, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
     [0xA5] = {.instruction = CPU_LDA, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 3},
     [0xB5] = {.instruction = CPU_LDA, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 4},
@@ -180,6 +189,24 @@ OpcodeEntry opcode_table[256] = {
     [0xDA] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
     [0xEA] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
     [0xFA] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x02] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x12] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x32] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x42] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x52] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x62] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x72] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x92] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0xB2] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0xD2] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0xF2] = {.instruction = CPU_NOP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+    [0x0C] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 4},
+    [0x1C] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 4},
+    [0x3C] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 4},
+    [0x5C] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 4},
+    [0x7C] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 4},
+    [0xDC] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 4},
+    [0xFC] = {.instruction = CPU_NOP, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 4},
 
     [0x09] = {.instruction = CPU_ORA, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
     [0x05] = {.instruction = CPU_ORA, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 3},
@@ -198,6 +225,14 @@ OpcodeEntry opcode_table[256] = {
 
     [0x28] = {.instruction = CPU_PLP, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 4},
 
+    [0x27] = {.instruction = CPU_RLA, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 5},
+    [0x37] = {.instruction = CPU_RLA, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 6},
+    [0x2F] = {.instruction = CPU_RLA, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 6},
+    [0x3F] = {.instruction = CPU_RLA, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 7},
+    [0x3B] = {.instruction = CPU_RLA, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 7},
+    [0x23] = {.instruction = CPU_RLA, .mode = ADDR_MODE_INDIRECT_X,     .len = 2, .cycles = 8},
+    [0x33] = {.instruction = CPU_RLA, .mode = ADDR_MODE_INDIRECT_Y,     .len = 2, .cycles = 8},
+
     [0x2A] = {.instruction = CPU_ROL, .mode = ADDR_MODE_ACCUMULATOR,    .len = 1, .cycles = 2},
     [0x26] = {.instruction = CPU_ROL, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 5},
     [0x36] = {.instruction = CPU_ROL, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 6},
@@ -210,6 +245,14 @@ OpcodeEntry opcode_table[256] = {
     [0x6E] = {.instruction = CPU_ROR, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 6},
     [0x7E] = {.instruction = CPU_ROR, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 7},
 
+    [0x67] = {.instruction = CPU_RRA, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 5},
+    [0x77] = {.instruction = CPU_RRA, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 6},
+    [0x6F] = {.instruction = CPU_RRA, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 6},
+    [0x7F] = {.instruction = CPU_RRA, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 7},
+    [0x7B] = {.instruction = CPU_RRA, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 7},
+    [0x63] = {.instruction = CPU_RRA, .mode = ADDR_MODE_INDIRECT_X,     .len = 2, .cycles = 8},
+    [0x73] = {.instruction = CPU_RRA, .mode = ADDR_MODE_INDIRECT_Y,     .len = 2, .cycles = 8},
+
     [0x40] = {.instruction = CPU_RTI, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 6},
 
     [0x60] = {.instruction = CPU_RTS, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 6},
@@ -220,6 +263,7 @@ OpcodeEntry opcode_table[256] = {
     [0x8F] = {.instruction = CPU_SAX, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 4},
 
     [0xE9] = {.instruction = CPU_SBC, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
+    [0xEB] = {.instruction = CPU_SBC, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
     [0xE5] = {.instruction = CPU_SBC, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 3},
     [0xF5] = {.instruction = CPU_SBC, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 4},
     [0xED] = {.instruction = CPU_SBC, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 4},
@@ -240,6 +284,22 @@ OpcodeEntry opcode_table[256] = {
     [0xC2] = {.instruction = CPU_SKB, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
     [0xE2] = {.instruction = CPU_SKB, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
 
+    [0x07] = {.instruction = CPU_SLO, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 5},
+    [0x17] = {.instruction = CPU_SLO, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 6},
+    [0x0F] = {.instruction = CPU_SLO, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 6},
+    [0x1F] = {.instruction = CPU_SLO, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 7},
+    [0x1B] = {.instruction = CPU_SLO, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 7},
+    [0x03] = {.instruction = CPU_SLO, .mode = ADDR_MODE_INDIRECT_X,     .len = 2, .cycles = 8},
+    [0x13] = {.instruction = CPU_SLO, .mode = ADDR_MODE_INDIRECT_Y,     .len = 2, .cycles = 8},
+
+    [0x47] = {.instruction = CPU_SRE, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 5},
+    [0x57] = {.instruction = CPU_SRE, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 6},
+    [0x4F] = {.instruction = CPU_SRE, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 6},
+    [0x5F] = {.instruction = CPU_SRE, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 7},
+    [0x5B] = {.instruction = CPU_SRE, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 7},
+    [0x43] = {.instruction = CPU_SRE, .mode = ADDR_MODE_INDIRECT_X,     .len = 2, .cycles = 8},
+    [0x53] = {.instruction = CPU_SRE, .mode = ADDR_MODE_INDIRECT_Y,     .len = 2, .cycles = 8},
+
     [0x85] = {.instruction = CPU_STA, .mode = ADDR_MODE_ZERO_PAGE,      .len = 2, .cycles = 3},
     [0x95] = {.instruction = CPU_STA, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 4},
     [0x8D] = {.instruction = CPU_STA, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 4},
@@ -256,6 +316,10 @@ OpcodeEntry opcode_table[256] = {
     [0x94] = {.instruction = CPU_STY, .mode = ADDR_MODE_ZERO_PAGE_X,    .len = 2, .cycles = 4},
     [0x8C] = {.instruction = CPU_STY, .mode = ADDR_MODE_ABSOLUTE,       .len = 3, .cycles = 4},
 
+    [0x9E] = {.instruction = CPU_SHX, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 5},
+
+    [0x9C] = {.instruction = CPU_SHY, .mode = ADDR_MODE_ABSOLUTE_X,     .len = 3, .cycles = 5},
+
     [0xAA] = {.instruction = CPU_TAX, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
 
     [0xA8] = {.instruction = CPU_TAY, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
@@ -267,6 +331,10 @@ OpcodeEntry opcode_table[256] = {
     [0x9A] = {.instruction = CPU_TXS, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
 
     [0x98] = {.instruction = CPU_TYA, .mode = ADDR_MODE_IMPLICIT,       .len = 1, .cycles = 2},
+
+    [0x8B] = {.instruction = CPU_XAA, .mode = ADDR_MODE_IMMEDIATE,      .len = 2, .cycles = 2},
+
+    [0x9B] = {.instruction = CPU_XAS, .mode = ADDR_MODE_ABSOLUTE_Y,     .len = 3, .cycles = 5},
 };
 
 CPU* CPU_init(Bus* bus) {
@@ -708,6 +776,22 @@ void CPU_JSR(CPU* cpu, AddressingMode mode) {
     cpu->pc = addr;
 }
 
+void CPU_LAS(CPU* cpu, AddressingMode mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+
+    uint8_t result = cpu->stack_pointer & data;
+
+    CPU_set_register_a(cpu, result);
+    cpu->reg_x = result;
+    cpu->stack_pointer = result;
+}
+
+void CPU_LAX(CPU* cpu, AddressingMode mode) {
+    CPU_LDA(cpu, mode);
+    CPU_TAX(cpu, mode);
+}
+
 void CPU_LDA(CPU* cpu, AddressingMode mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
     uint8_t value = CPU_mem_read_u8(cpu, addr);
@@ -795,6 +879,11 @@ void CPU_PLP(CPU* cpu, AddressingMode mode) {
     CPU_set_status_flag(cpu, BREAK2);
 }
 
+void CPU_RLA(CPU* cpu, AddressingMode mode) {
+    CPU_ROL(cpu, mode);
+    CPU_AND(cpu, mode);
+}
+
 void CPU_ROL(CPU* cpu, AddressingMode mode) {
     uint16_t addr;
     uint8_t data;
@@ -860,6 +949,11 @@ void CPU_ROR(CPU* cpu, AddressingMode mode) {
     }
 }
 
+void CPU_RRA(CPU* cpu, AddressingMode mode) {
+    CPU_ROR(cpu, mode);
+    CPU_ADC(cpu, mode);
+}
+
 void CPU_RTS(CPU* cpu, AddressingMode mode) {
     uint16_t addr = CPU_stack_pop_u16(cpu);
     cpu->pc = addr + 1;
@@ -900,6 +994,16 @@ void CPU_SKB(CPU* cpu, AddressingMode mode) {
     CPU_get_operand_addr(cpu, mode); // Read the operand but do nothing with it
 }
 
+void CPU_SLO(CPU* cpu, AddressingMode mode) {
+    CPU_ASL(cpu, mode);
+    CPU_ORA(cpu, mode);
+}
+
+void CPU_SRE(CPU* cpu, AddressingMode mode) {
+    CPU_LSR(cpu, mode);
+    CPU_EOR(cpu, mode);
+}
+
 void CPU_STA(CPU* cpu, AddressingMode mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
     CPU_mem_write_u8(cpu, addr, cpu->reg_a);
@@ -913,6 +1017,18 @@ void CPU_STX(CPU* cpu, AddressingMode mode) {
 void CPU_STY(CPU* cpu, AddressingMode mode) {
     uint16_t addr = CPU_get_operand_addr(cpu, mode);
     CPU_mem_write_u8(cpu, addr, cpu->reg_y);
+}
+
+void CPU_SHX(CPU* cpu, AddressingMode mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t result = cpu->reg_x & ( ((uint8_t) (addr >> 8)) + 1 );
+    CPU_mem_write_u8(cpu, addr, result);
+}
+
+void CPU_SHY(CPU* cpu, AddressingMode mode) {
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t result = cpu->reg_y & ( ((uint8_t) (addr >> 8)) + 1 );
+    CPU_mem_write_u8(cpu, addr, result);
 }
 
 void CPU_TAX(CPU* cpu, AddressingMode mode) {
@@ -943,6 +1059,22 @@ void CPU_TYA(CPU* cpu, AddressingMode mode) {
     cpu->reg_a = cpu->reg_y;
     CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
 }
+
+void CPU_XAA(CPU* cpu, AddressingMode mode) {
+    cpu->reg_a = cpu->reg_x;
+    CPU_update_zero_and_negative_flags(cpu, cpu->reg_a);
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t data = CPU_mem_read_u8(cpu, addr);
+    CPU_set_register_a(cpu, cpu->reg_a & data);
+}
+
+void CPU_XAS(CPU* cpu, AddressingMode mode) {
+    cpu->stack_pointer = cpu->reg_x & cpu->reg_a;
+    uint16_t addr = CPU_get_operand_addr(cpu, mode);
+    uint8_t result = cpu->stack_pointer & ( ((uint8_t) (addr >> 8)) + 1 );
+    CPU_mem_write_u8(cpu, addr, result);
+}
+
 
 
 uint8_t CPU_get_status_flag(CPU* cpu, StatusFlag flag) {

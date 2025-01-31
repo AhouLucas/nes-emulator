@@ -92,7 +92,7 @@ void        CPU_mem_write_u16(CPU*, uint16_t, uint16_t);
 uint16_t    CPU_stack_pop_u16(CPU*);
 void        CPU_stack_push_u16(CPU*, uint16_t);
 
-uint16_t CPU_get_operand_addr(CPU*, AddressingMode);
+uint16_t    CPU_get_operand_addr(CPU*, AddressingMode);
 
 // Program execution
 
@@ -138,6 +138,8 @@ void CPU_INY(CPU*, AddressingMode);
 void CPU_ISC(CPU*, AddressingMode);
 void CPU_JMP(CPU*, AddressingMode);
 void CPU_JSR(CPU*, AddressingMode);
+void CPU_LAS(CPU*, AddressingMode);
+void CPU_LAX(CPU*, AddressingMode);
 void CPU_LDA(CPU*, AddressingMode);
 void CPU_LDX(CPU*, AddressingMode);
 void CPU_LDY(CPU*, AddressingMode);
@@ -150,10 +152,12 @@ void CPU_PHA(CPU*, AddressingMode);
 void CPU_PHP(CPU*, AddressingMode);
 void CPU_PLA(CPU*, AddressingMode);
 void CPU_PLP(CPU*, AddressingMode);
+void CPU_RLA(CPU*, AddressingMode);
 void CPU_ROL(CPU*, AddressingMode);
 void CPU_ROL(CPU*, AddressingMode);
 void CPU_ROR(CPU*, AddressingMode);
 void CPU_ROR(CPU*, AddressingMode);
+void CPU_RRA(CPU*, AddressingMode);
 void CPU_RTI(CPU*, AddressingMode);
 void CPU_RTS(CPU*, AddressingMode);
 void CPU_SAX(CPU*, AddressingMode);
@@ -161,7 +165,11 @@ void CPU_SBC(CPU*, AddressingMode);
 void CPU_SEC(CPU*, AddressingMode);
 void CPU_SED(CPU*, AddressingMode);
 void CPU_SEI(CPU*, AddressingMode);
+void CPU_SHX(CPU*, AddressingMode);
+void CPU_SHY(CPU*, AddressingMode);
 void CPU_SKB(CPU*, AddressingMode);
+void CPU_SLO(CPU*, AddressingMode);
+void CPU_SRE(CPU*, AddressingMode);
 void CPU_STA(CPU*, AddressingMode);
 void CPU_STX(CPU*, AddressingMode);
 void CPU_STY(CPU*, AddressingMode);
@@ -171,16 +179,18 @@ void CPU_TSX(CPU*, AddressingMode);
 void CPU_TXA(CPU*, AddressingMode);
 void CPU_TXS(CPU*, AddressingMode);
 void CPU_TYA(CPU*, AddressingMode);
+void CPU_XAA(CPU*, AddressingMode);
+void CPU_XAS(CPU*, AddressingMode);
 
 // CPU instructions helpers
 
 uint8_t CPU_get_status_flag(CPU*, StatusFlag);
-void CPU_set_status_flag(CPU*, StatusFlag);
-void CPU_clear_status_flag(CPU*, StatusFlag);
-void CPU_update_zero_and_negative_flags(CPU*, uint8_t);
-void CPU_set_register_a(CPU*, uint8_t);
-void CPU_add_to_register_a(CPU*, uint8_t);
-void CPU_compare(CPU*, AddressingMode, uint8_t);
-void CPU_branch(CPU*, bool);
+void    CPU_set_status_flag(CPU*, StatusFlag);
+void    CPU_clear_status_flag(CPU*, StatusFlag);
+void    CPU_update_zero_and_negative_flags(CPU*, uint8_t);
+void    CPU_set_register_a(CPU*, uint8_t);
+void    CPU_add_to_register_a(CPU*, uint8_t);
+void    CPU_compare(CPU*, AddressingMode, uint8_t);
+void    CPU_branch(CPU*, bool);
 
 /* End Instruction processing */

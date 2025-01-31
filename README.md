@@ -10,4 +10,4 @@ NES Emulator written in C
 
 ## TODO
 
-- [ ] Implement unofficial instructions
+- [ ] Implement PPU
